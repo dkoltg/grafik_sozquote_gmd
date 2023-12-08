@@ -71,7 +71,7 @@ library(plotly)
 ```
 
 
-```{r warning=FALSE, echo=FALSE, message=FALSE}
+```{r warning=FALSE, echo=FALSE, message=FALSE, fig.width=5}
 ggplotly(plot.sozquot_gmd)
 ```
 
