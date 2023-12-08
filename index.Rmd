@@ -49,7 +49,7 @@ library(scales)
 plot.sozquot_gmd <- d.sozquote_gmd %>% 
   ggplot(aes(x=Jahr, y=Sozialhilfequote, group=1)) +
   geom_line(color="#27408B") +
-  facet_wrap(~gemeinde) +
+  facet_wrap(~gemeinde, ncol=3) +
   geom_line(data=d.sozquote_kt, aes(x=Jahr, y=Sozialhilfequote), color="#878787") +
   labs(y="", x="") +
   theme(legend.position = "bottom",
