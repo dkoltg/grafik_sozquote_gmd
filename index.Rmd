@@ -1,0 +1,77 @@
+---
+title: ""
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Vorbereitung Auswertung: Notwendige Packages laden (1)
+library(foreign)
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(ggrepel)
+library(ggtext)
+# library(ggpp)
+library(patchwork)
+library(odsAPI)
+
+source("R/funktionen.R", encoding="UTF-8")
+
+####
+# Daten von data.tg.ch laden
+# Set domain für Bezug Daten von data.tg.ch
+set_domain("kantonthurgau.opendatasoft.com")
+
+# Daten laden
+# Quote Ebene Kanton
+d.sozquote_kt  <- get_dataset(dataset_id = "sk-stat-86") %>% 
+  # mutate(sozialhilfequote=sozialhilfequote/10) %>% 
+  dplyr::select(name, jahr, sozialhilfequote) %>% 
+  # type.convert(as.is=T) %>% 
+  rename(Jahr=jahr,
+         Sozialhilfequote=sozialhilfequote)
+
+# Quote Zentren
+d.sozquote_gmd <- get_dataset(dataset_id = "sk-stat-80") %>%
+  filter(gemeinde=="Frauenfeld" | gemeinde=="Kreuzlingen" | gemeinde=="Arbon" |
+           gemeinde=="Amriswil" | gemeinde=="Weinfelden" | gemeinde=="Romanshorn" |
+           gemeinde=="Aadorf" | gemeinde=="Sirnach" | gemeinde=="Bischofszell" |
+           gemeinde=="Münchwilen" | gemeinde=="Diessenhofen" | gemeinde=="Steckborn") %>% 
+  dplyr::select(-bfs_nr_gemeinde) %>% 
+  # type.convert(as.is=T) %>% 
+  rename(Jahr=jahr,
+         Sozialhilfequote=sozialhilfequote)
+
+
+### Grafik
+library(scales)
+plot.sozquot_gmd <- d.sozquote_gmd %>% 
+  ggplot(aes(x=Jahr, y=Sozialhilfequote, group=1)) +
+  geom_line(color="#27408B") +
+  facet_wrap(~gemeinde) +
+  geom_line(data=d.sozquote_kt, aes(x=Jahr, y=Sozialhilfequote), color="#878787") +
+  labs(y="", x="") +
+  theme(legend.position = "bottom",
+        panel.spacing.x = unit(0, "pt"),
+    strip.background = element_rect(color="grey", fill="white"),
+    # axis.text.y=element_blank(),
+    strip.placement = "outside",
+    panel.background = element_rect(color="white", fill="white"),
+    panel.grid.major.y = element_line(size=0.1, color="grey"),
+    panel.grid.minor.y =  element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x =  element_blank()
+  ) +
+  scale_x_discrete(breaks=c("2011", "2014", "2017", "2020"))
+plot.sozquot_gmd
+
+library(plotly)
+
+```
+
+
+```{r warning=FALSE, echo=FALSE, message=FALSE}
+ggplotly(plot.sozquot_gmd)
+```
+
